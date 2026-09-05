@@ -69,7 +69,7 @@ const container = document.getElementById('globeViz');
 const globe = Globe()
   (container)
   .globeImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg')
-  .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+  .bumpImageUrl(null)
   .htmlElementsData([]) // Untuk nanti menampilkan label/marker di atas globe
   .htmlLat(d => d.lat)
   .htmlLng(d => d.lng)

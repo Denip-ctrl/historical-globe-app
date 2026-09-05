@@ -68,9 +68,10 @@ const historicalData = {
 const container = document.getElementById('globeViz');
 const globe = Globe()
   (container)
-  .globeImageUrl('https://raw.githubusercontent.com/turban/webgl-earth/master/images/2$/*')
+  // Gunakan file gambar tekstur tunggal yang cerah
+  .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
   .bumpImageUrl(null)
-  .htmlElementsData([]) // Untuk nanti menampilkan label/marker di atas globe
+  .htmlElementsData([])
   .htmlLat(d => d.lat)
   .htmlLng(d => d.lng)
   .htmlElement(d => {
@@ -79,15 +80,11 @@ const globe = Globe()
     return el;
   });
 
-// Mengatur agar lampu latar/pencahayaan merata ke seluruh sisi bola dunia
+// Mengatur pencahayaan agar lebih terang merata menggunakan fungsi internal globe
 const directionalLight = globe.scene().getObjectByProperty('type', 'DirectionalLight');
 if (directionalLight) {
-  directionalLight.intensity = 2.5; // Memperkuat intensitas cahaya utama
+  directionalLight.intensity = 3.0; // Perkuat cahaya utama agar sangat terang
 }
-
-// Menambahkan AmbientLight tambahan agar bagian yang tadinya gelap ikut terang benderang
-const ambientLight = new THREE.AmbientLight(0xffffff, 1.2); 
-globe.scene().add(ambientLight);
 
 // Sesuaikan ukuran globe dengan jendela browser
 window.addEventListener('resize', () => {

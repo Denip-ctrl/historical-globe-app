@@ -2,6 +2,16 @@
 const historicalData = {
   "Nusantara & Asia Tenggara": [
     {
+      id: "tarumanagara",
+      name: "Tarumanagara",
+      start: 400,
+      end: 669,
+      lat: -6.4058,
+      lng: 106.8584,
+      zoomAlt: 1.5,
+      desc: "Salah satu kerajaan Hindu tertua di pulau Jawa yang berpusat di dekat Bogor/Bekasi."
+    },
+    {
       id: "sriwijaya",
       name: "Kedatuan Sriwijaya",
       start: 683,
@@ -9,7 +19,37 @@ const historicalData = {
       lat: -3.3166,
       lng: 104.9053,
       zoomAlt: 1.5,
-      desc: "Kerajaan maritim Buddha bersar di Sumatra yang menguasai jalur perdagangan Selat Malaka."
+      desc: "Kerajaan maritim Buddha besar di Sumatra yang menguasai jalur perdagangan Selat Malaka."
+    },
+    {
+      id: "medang",
+      name: "Kerajaan Medang (Mataram Kuno)",
+      start: 732,
+      end: 1016,
+      lat: -7.7956,
+      lng: 110.3695,
+      zoomAlt: 1.5,
+      desc: "Kerajaan di Jawa Tengah dan Timur yang membangun banyak candi megah termasuk Borobudur dan Prambanan."
+    },
+    {
+      id: "kediri",
+      name: "Kerajaan Kediri (Panjalu)",
+      start: 1042,
+      end: 1222,
+      lat: -7.8166,
+      lng: 112.0117,
+      zoomAlt: 1.5,
+      desc: "Kerajaan agraris dan maritim di Jawa Timur yang terkenal dengan kesusastraannya."
+    },
+    {
+      id: "singasari",
+      name: "Kerajaan Singasari",
+      start: 1222,
+      end: 1292,
+      lat: -7.9425,
+      lng: 112.5954,
+      zoomAlt: 1.5,
+      desc: "Kerajaan yang didirikan oleh Ken Arok dan memperluas pengaruhnya hingga ekspedisi Pamalayu."
     },
     {
       id: "majapahit",
@@ -19,7 +59,17 @@ const historicalData = {
       lat: -7.5506,
       lng: 112.2350,
       zoomAlt: 1.5,
-      desc: "Kerajaan Hindu-Buddha terakhir yang berpusat di Jawa Timur dan menguasai sebagian besar nusantara."
+      desc: "Kerajaan Hindu-Buddha terakhir yang berpusat di Jawa Timur dan menyatukan nusantara."
+    },
+    {
+      id: "demak",
+      name: "Kesultanan Demak",
+      start: 1475,
+      end: 1554,
+      lat: -6.8947,
+      lng: 110.6384,
+      zoomAlt: 1.5,
+      desc: "Kesultanan Islam pertama di Jawa yang berperan besar dalam penyebaran agama Islam di Nusantara."
     },
     {
       id: "mataram_islam",
@@ -50,16 +100,6 @@ const historicalData = {
       lng: 113.9213,
       zoomAlt: 1.8,
       desc: "Negara kesatuan merdeka yang lahir setelah memproklamirkan kemerdekaan pada 17 Agustus 1945."
-    },
-    {
-      id: "malaysia_singapura_1965",
-      name: "Malaysia & Singapura Modern",
-      start: 1965,
-      end: 1970,
-      lat: 3.1390,
-      lng: 101.6869,
-      zoomAlt: 1.5,
-      desc: "Era pasca-pemisahan Singapura dari Malaysia, membentuk kedaulatan negara modern di Selat Malaka."
     }
   ]
 };

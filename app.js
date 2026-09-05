@@ -78,10 +78,6 @@ const globe = Globe()
     el.innerHTML = `<div style="background: rgba(255,0,0,0.8); color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; pointer-events: none;">📍 ${d.name}</div>`;
     return el;
   });
-// Setelah inisialisasi globe, tambahkan kode ini:
-const globe = Globe()(container)
-  .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-  .bumpImageUrl(null);
 
 // Mengatur agar lampu latar/pencahayaan merata ke seluruh sisi bola dunia
 const directionalLight = globe.scene().getObjectByProperty('type', 'DirectionalLight');

@@ -71,7 +71,7 @@ const globe = Globe()
   .globeImageUrl('const globe = Globe()
   (container)
   // Tekstur peta terang Natural Earth
-  .globeImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg')
+  .globeImageUrl('//unpkg.com/three-globe/example/img/earth-water.png')
   .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
   .htmlElementsData([]) // Untuk nanti menampilkan label/marker di atas globe
   .htmlLat(d => d.lat)

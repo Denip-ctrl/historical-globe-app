@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Globe Sejarah Interaktif</title>
+  <style>
+    body { margin: 0; background: #000; font-family: sans-serif; overflow: hidden; }
+    #slider-container { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10; color: white; text-align: center; background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 8px; }
+    #sidebar { position: absolute; top: 20px; left: 20px; z-index: 10; width: 300px; background: rgba(0,0,0,0.8); color: white; padding: 15px; border-radius: 8px; max-height: 80vh; overflow-y: auto; }
+  </style>
+  <!-- Pustaka Globe.gl dan Three.js -->
+  <script src="https://unpkg.com/globe.gl"></script>
+</head>
+<body>
+
+  <div id="sidebar">
+    <h3>Navigasi Wilayah</h3>
+    <div id="region-list">
+      <!-- Daftar wilayah dan dinasti akan muncul di sini via JavaScript -->
+    </div>
+  </div>
+
+  <div id="slider-container">
+    <label>Tahun: <span id="year-label">1350</span></label><br>
+    <input type="range" id="year-slider" min="800" max="1970" value="1350" step="1" style="width: 300px;">
+  </div>
+
+  <div id="globeViz"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

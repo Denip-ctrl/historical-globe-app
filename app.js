@@ -68,7 +68,7 @@ const historicalData = {
 const container = document.getElementById('globeViz');
 const globe = Globe()
   (container)
-  .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+  .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')
   .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
   .htmlElementsData([]) // Untuk nanti menampilkan label/marker di atas globe
   .htmlLat(d => d.lat)

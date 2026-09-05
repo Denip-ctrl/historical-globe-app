@@ -68,9 +68,6 @@ const historicalData = {
 const container = document.getElementById('globeViz');
 const globe = Globe()
   (container)
-  .globeImageUrl('const globe = Globe()
-  (container)
-  // Tekstur peta terang Natural Earth
   .globeImageUrl('//unpkg.com/three-globe/example/img/earth-water.png')
   .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
   .htmlElementsData([]) // Untuk nanti menampilkan label/marker di atas globe

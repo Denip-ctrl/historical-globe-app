@@ -69,7 +69,7 @@ const container = document.getElementById('globeViz');
 const globe = Globe()
   (container)
   // Gunakan file gambar tekstur tunggal yang cerah
-  .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+  .globeImageUrl(''//unpkg.com/three-globe/example/img/earth-water.png'')
   .bumpImageUrl(null)
   .htmlElementsData([])
   .htmlLat(d => d.lat)

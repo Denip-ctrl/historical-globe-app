@@ -68,7 +68,7 @@ const historicalData = {
 const container = document.getElementById('globeViz');
 const globe = Globe()
   (container)
-  .globeImageUrl('https://unpkg.com/three-globe@2.27.3/example/img/earth-blue-marble.jpg')
+  .globeImageUrl('https://raw.githubusercontent.com/turban/webgl-earth/master/images/2$/*')
   .bumpImageUrl(null)
   .htmlElementsData([]) // Untuk nanti menampilkan label/marker di atas globe
   .htmlLat(d => d.lat)

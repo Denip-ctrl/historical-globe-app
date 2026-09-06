@@ -145,6 +145,7 @@ window.addEventListener('resize', () => {
 });
 
 // --- 3. INISIALISASI PETA 2D (LEAFLET) DI LUAR (GLOBAL) ---
+// --- 3. INISIALISASI PETA 2D (LEAFLET) DI LUAR (GLOBAL) ---
 const map2D = L.map('map2D', { zoomControl: false }).setView([-7.7956, 110.3695], 8);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -161,31 +162,45 @@ fetch('geojson/mataram_kuno.geojson')
   })
   .catch(err => console.error("Gagal memuat GeoJSON Leaflet:", err));
 
-// --- TAMBAHKAN LOGIKA ZOOM OUT DI SINI ---
+// --- PEMANTAU ZOOM OUT PETA 2D (KEMBALI KE GLOBE) ---
 map2D.on('zoom', () => {
   const currentZoom = map2D.getZoom();
-  // Jika pengguna melakukan zoom out di peta 2D hingga di bawah level 7 (sesuaikan selera)
   if (currentZoom < 7) {
     const globeElement = document.getElementById('globeViz');
     const mapElement = document.getElementById('map2D');
 
-    if (globeElement && mapElement) {
-      // Kembalikan tampilan ke Globe 3D secara mulus
+    if (globeElement && mapElement && mapElement.style.opacity === '1') {
       globeElement.style.opacity = '1';
       globeElement.style.pointerEvents = 'auto';
       
       mapElement.style.opacity = '0';
       mapElement.style.pointerEvents = 'none';
 
-      // Sinkronkan posisi kamera globe kembali ke posisi Medang dengan altitude transisi
-      globe.pointOfView({ lat: -7.7956, lng: 110.3695, altitude: 0.15 }, 500);
-      
-      // Reset zoom peta 2D ke posisi awal agar siap jika dibuka lagi nanti
+      globe.pointOfView({ lat: -7.7956, lng: 110.3695, altitude: 0.4 }, 500);
       map2D.setView([-7.7956, 110.3695], 8);
     }
   }
 });
 
+// --- PEMANTAU ZOOM IN MANUAL PADA GLOBE ---
+setInterval(() => {
+  const pov = globe.pointOfView();
+  const globeElement = document.getElementById('globeViz');
+  const mapElement = document.getElementById('map2D');
+
+  // Jika pengguna melakukan zoom in manual hingga altitude < 0.25 dan peta 2D sedang tersembunyi
+  if (pov && pov.altitude < 0.25 && globeElement && mapElement && globeElement.style.opacity === '1') {
+    globeElement.style.opacity = '0';
+    globeElement.style.pointerEvents = 'none';
+    
+    mapElement.style.opacity = '1';
+    mapElement.style.pointerEvents = 'auto';
+
+    if (typeof map2D !== 'undefined') {
+      map2D.invalidateSize();
+    }
+  }
+}, 300);
 
 // --- 4. ELEMEN UI DOM & RENDER APLIKASI ---
 const yearSlider = document.getElementById('year-slider');
@@ -229,41 +244,44 @@ function updateApp(currentYear) {
         btn.style.borderRadius = '4px';
 
         // Event Klik Tombol Dinasti
-        btn.onclick = () => {
-          const globeElement = document.getElementById('globeViz');
-          const mapElement = document.getElementById('map2D');
+        // Event Klik Tombol Dinasti
+btn.onclick = () => {
+  const globeElement = document.getElementById('globeViz');
+  const mapElement = document.getElementById('map2D');
 
-          if (dynasty.id === 'medang') {
-            globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.15 }, 1500);
+  if (dynasty.id === 'medang') {
+    // Klik Medang memicu zoom otomatis ke posisi transisi
+    globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.15 }, 1500);
 
-            setTimeout(() => {
-              if (globeElement && mapElement) {
-                globeElement.style.opacity = '0';
-                globeElement.style.pointerEvents = 'none';
-                
-                mapElement.style.opacity = '1';
-                mapElement.style.pointerEvents = 'auto';
+    setTimeout(() => {
+      if (globeElement && mapElement) {
+        globeElement.style.opacity = '0';
+        globeElement.style.pointerEvents = 'none';
+        
+        mapElement.style.opacity = '1';
+        mapElement.style.pointerEvents = 'auto';
 
-                if (typeof map2D !== 'undefined') {
-                  map2D.invalidateSize();
-                }
-              }
-            }, 1500);
-          } else {
-            if (globeElement && mapElement) {
-              globeElement.style.opacity = '1';
-              globeElement.style.pointerEvents = 'auto';
-              
-              mapElement.style.opacity = '0';
-              mapElement.style.pointerEvents = 'none';
-            }
+        if (typeof map2D !== 'undefined') {
+          map2D.invalidateSize();
+        }
+      }
+    }, 1500);
+  } else {
+    // Klik dinasti lain otomatis menutup peta 2D dan mengembalikan globe
+    if (globeElement && mapElement) {
+      globeElement.style.opacity = '1';
+      globeElement.style.pointerEvents = 'auto';
+      
+      mapElement.style.opacity = '0';
+      mapElement.style.pointerEvents = 'none';
+    }
 
-            globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: dynasty.zoomAlt }, 1500);
-          }
+    globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: dynasty.zoomAlt }, 1500);
+  }
 
-          console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
-        };
-
+  console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
+};
+        
         regionBox.appendChild(btn);
       }
     });

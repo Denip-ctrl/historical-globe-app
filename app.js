@@ -145,7 +145,6 @@ window.addEventListener('resize', () => {
 });
 
 // --- 3. INISIALISASI PETA 2D (LEAFLET) DI LUAR (GLOBAL) ---
-// --- 3. INISIALISASI PETA 2D (LEAFLET) DI LUAR (GLOBAL) ---
 const map2D = L.map('map2D', { zoomControl: false }).setView([-7.7956, 110.3695], 8);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -307,3 +306,15 @@ yearSlider.addEventListener('input', (e) => {
 
 // Jalankan saat pertama kali halaman dimuat
 updateApp(parseInt(yearSlider.value));
+
+// --- PAKSA STATUS AWAL AMAN SAAT HALAMAN DIMUAT ---
+document.addEventListener("DOMContentLoaded", () => {
+  const globeElement = document.getElementById('globeViz');
+  const mapElement = document.getElementById('map2D');
+  if (globeElement && mapElement) {
+    globeElement.style.opacity = '1';
+    globeElement.style.pointerEvents = 'auto';
+    mapElement.style.opacity = '0';
+    mapElement.style.pointerEvents = 'none';
+  }
+});

@@ -108,17 +108,13 @@ const historicalData = {
 const container = document.getElementById('globeViz');
 const globe = Globe()
   (container)
-  // Gunakan file gambar tekstur tunggal yang cerah
   .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')
   .bumpImageUrl(null)
-
-  // TAMBAHKAN BAGIAN INI UNTUK POLIGON:
   .polygonsData([]) 
   .polygonAltitude(0.01) 
   .polygonCapColor(() => 'rgba(0, 100, 255, 0.1)') 
   .polygonSideColor(() => 'rgba(0, 100, 255, 0.2)')
   .polygonStrokeColor(() => '#ffffff')
-  
   .htmlElementsData([])
   .htmlLat(d => d.lat)
   .htmlLng(d => d.lng)
@@ -128,42 +124,57 @@ const globe = Globe()
     return el;
   });
 
-// Load file GeoJSON Mataram Kuno
+// Load file GeoJSON Mataram Kuno ke Globe
 fetch('geojson/mataram_kuno.geojson')
   .then(res => res.json())
   .then(geojson => {
-    // Masukkan data poligon ke globe
     globe.polygonsData(geojson.features);
   })
-  .catch(err => console.error("Gagal memuat GeoJSON:", err));
+  .catch(err => console.error("Gagal memuat GeoJSON Globe:", err));
 
-// Mengatur pencahayaan agar lebih terang merata menggunakan fungsi internal globe
+// Pengaturan pencahayaan globe
 const directionalLight = globe.scene().getObjectByProperty('type', 'DirectionalLight');
 if (directionalLight) {
-  directionalLight.intensity = 3.0; // Perkuat cahaya utama agar sangat terang
+  directionalLight.intensity = 3.0;
 }
 
-// Sesuaikan ukuran globe dengan jendela browser
+// Sesuaikan ukuran globe saat jendela di-resize
 window.addEventListener('resize', () => {
   globe.width(window.innerWidth);
   globe.height(window.innerHeight);
 });
 
-// --- 3. ELEMEN UI DOM ---
+
+// --- 3. INISIALISASI PETA 2D (LEAFLET) DI LUAR (GLOBAL) ---
+const map2D = L.map('map2D', { zoomControl: false }).setView([-7.7956, 110.3695], 8);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+}).addTo(map2D);
+
+// Muat GeoJSON langsung ke peta 2D agar tajam
+fetch('geojson/mataram_kuno.geojson')
+  .then(res => res.json())
+  .then(data => {
+    L.geoJSON(data, {
+      style: { color: "#ffffff", weight: 2, fillColor: "#ff8800", fillOpacity: 0.4 }
+    }).addTo(map2D);
+  })
+  .catch(err => console.error("Gagal memuat GeoJSON Leaflet:", err));
+
+
+// --- 4. ELEMEN UI DOM & RENDER APLIKASI ---
 const yearSlider = document.getElementById('year-slider');
 const yearLabel = document.getElementById('year-label');
 const regionListDiv = document.getElementById('region-list');
 
-// --- 4. FUNGSI RENDER MENU BERDASARKAN TAHUN SLIDER ---
 function updateApp(currentYear) {
   yearLabel.innerText = currentYear;
-  regionListDiv.innerHTML = ''; // Kosongkan daftar wilayah
+  regionListDiv.innerHTML = '';
 
   let activeMarkers = [];
 
-  // Looping wilayah & dinasti
   for (const [regionName, dynasties] of Object.entries(historicalData)) {
-    // Buat wadah kategori wilayah
     const regionBox = document.createElement('div');
     regionBox.style.marginBottom = '15px';
     
@@ -176,7 +187,6 @@ function updateApp(currentYear) {
     let activeCount = 0;
 
     dynasties.forEach(dynasty => {
-      // Cek apakah dinasti hidup/aktif pada tahun yang ditunjukkan slider
       if (currentYear >= dynasty.start && currentYear <= dynasty.end) {
         activeCount++;
         activeMarkers.push(dynasty);
@@ -194,91 +204,55 @@ function updateApp(currentYear) {
         btn.style.textAlign = 'left';
         btn.style.borderRadius = '4px';
 
-       // Ketika tombol dinasti diklik: Arahkan kamera globe ke lokasinya
-// --- 1. EVENT KLIK TOMBOL DINASTI ---
-btn.onclick = () => {
-  const globeElement = document.getElementById('globeViz');
-  const mapElement = document.getElementById('map2D');
+        // Event Klik Tombol Dinasti
+        btn.onclick = () => {
+          const globeElement = document.getElementById('globeViz');
+          const mapElement = document.getElementById('map2D');
 
-  if (dynasty.id === 'medang') {
-    // Arahkan kamera globe mendekat ke lokasi Medang
-    globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.15 }, 1500);
+          if (dynasty.id === 'medang') {
+            globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.15 }, 1500);
 
-    // Setelah animasi zoom globe selesai, sembunyikan globe dan tampilkan peta datar
-    setTimeout(() => {
-      if (globeElement && mapElement) {
-        globeElement.style.opacity = '0';
-        globeElement.style.pointerEvents = 'none';
-        
-        mapElement.style.opacity = '1';
-        mapElement.style.pointerEvents = 'auto';
+            setTimeout(() => {
+              if (globeElement && mapElement) {
+                globeElement.style.opacity = '0';
+                globeElement.style.pointerEvents = 'none';
+                
+                mapElement.style.opacity = '1';
+                mapElement.style.pointerEvents = 'auto';
 
-        if (typeof map2D !== 'undefined') {
-          map2D.invalidateSize();
-        }
-      }
-    }, 1500);
-  } else {
-    // Kembalikan globe dan sembunyikan peta 2D jika klik dinasti lain
-    if (globeElement && mapElement) {
-      globeElement.style.opacity = '1';
-      globeElement.style.pointerEvents = 'auto';
-      
-      mapElement.style.opacity = '0';
-      mapElement.style.pointerEvents = 'none';
-    }
+                if (typeof map2D !== 'undefined') {
+                  map2D.invalidateSize();
+                }
+              }
+            }, 1500);
+          } else {
+            if (globeElement && mapElement) {
+              globeElement.style.opacity = '1';
+              globeElement.style.pointerEvents = 'auto';
+              
+              mapElement.style.opacity = '0';
+              mapElement.style.pointerEvents = 'none';
+            }
 
-    globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: dynasty.zoomAlt }, 1500);
-  }
+            globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: dynasty.zoomAlt }, 1500);
+          }
 
-  console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
-}; // <-- Pastikan titik koma dan kurung tutup ini ada di sini!
-
-
-// --- 2. INISIALISASI PETA 2D & FETCH DATA ---
-const map2D = L.map('map2D', { zoomControl: false }).setView([-7.7956, 110.3695], 8);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-}).addTo(map2D);
-
-// Muat GeoJSON untuk Globe 3D
-fetch('geojson/mataram_kuno.geojson')
-  .then(res => res.json())
-  .then(geojson => {
-    globe.polygonsData(geojson.features);
-  });
-
-// Muat GeoJSON langsung ke peta 2D agar tajam
-fetch('geojson/mataram_kuno.geojson')
-  .then(res => res.json())
-  .then(data => {
-    L.geoJSON(data, {
-      style: { color: "#ffffff", weight: 2, fillColor: "#ff8800", fillOpacity: 0.4 }
-    }).addTo(map2D);
-  });
-
-  
-  
-  console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
-};
+          console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
+        };
 
         regionBox.appendChild(btn);
       }
     });
 
-    // Jika ada dinasti yang aktif di wilayah ini pada tahun tersebut, tampilkan kotaknya
     if (activeCount > 0) {
       regionListDiv.appendChild(regionBox);
     }
   }
 
-  // Jika di tahun tersebut sama sekali belum ada data
   if (activeMarkers.length === 0) {
-    regionListDiv.innerHTML = `<p style="color: #aaa; font-style: italic;">Data wilayah untuk tahun ${currentYear} belum tersedia di database prototype.</p>';
-    globe.htmlElementsData([]); // Bersihkan marker di globe
+    regionListDiv.innerHTML = `<p style="color: #aaa; font-style: italic;">Data wilayah untuk tahun ${currentYear} belum tersedia di database prototype.</p>`;
+    globe.htmlElementsData([]);
   } else {
-    // Perbarui penanda titik di globe 3D sesuai entitas yang aktif
     globe.htmlElementsData(activeMarkers);
   }
 }
@@ -289,5 +263,5 @@ yearSlider.addEventListener('input', (e) => {
   updateApp(selectedYear);
 });
 
-// Jalankan saat pertama kali halaman dimuat (default tahun 1350)
+// Jalankan saat pertama kali halaman dimuat
 updateApp(parseInt(yearSlider.value));

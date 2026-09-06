@@ -140,9 +140,12 @@ function isCursorOverUI() {
 
 
 // --- 2. INISIALISASI GLOBE 3D ---
+// --- INISIALISASI GLOBE DENGAN UKURAN KONTANER YANG JELAS ---
 const container = document.getElementById('globeViz');
 const globe = Globe()
   (container)
+  .width(container.clientWidth || 900)   // Ambil lebar kontainer secara dinamis
+  .height(container.clientHeight || 500) // Ambil tinggi kontainer secara dinamis
   .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')
   .bumpImageUrl(null)
   .polygonsData([]) 
@@ -175,8 +178,11 @@ if (directionalLight) {
 
 // Sesuaikan ukuran globe saat jendela di-resize
 window.addEventListener('resize', () => {
-  globe.width(window.innerWidth);
-  globe.height(window.innerHeight);
+  const wrapper = document.getElementById('map-container-wrapper');
+  if (wrapper) {
+    globe.width(wrapper.clientWidth);
+    globe.height(wrapper.clientHeight);
+  }
 });
 
 // --- TAMBAHKAN VARIABEL STATUS DI BAGIAN ATAS ---

@@ -131,8 +131,8 @@ function isCursorOverUI() {
   const overSlider = (
     mouseX >= rectSlider.left &&
     mouseX <= rectSlider.right &&
-    mouseX >= rectSlider.top &&
-    mouseY <= rectSlider.bottom // Perbaikan kecil pada pengecekan bawah slider
+    mouseY >= rectSlider.top &&
+    mouseY <= rectSlider.bottom
   );
 
   return overSidebar || overSlider;
@@ -140,12 +140,11 @@ function isCursorOverUI() {
 
 
 // --- 2. INISIALISASI GLOBE 3D ---
-// --- INISIALISASI GLOBE DENGAN UKURAN KONTANER YANG JELAS ---
 const container = document.getElementById('globeViz');
 const globe = Globe()
   (container)
-  .width(container.clientWidth || 900)   // Ambil lebar kontainer secara dinamis
-  .height(container.clientHeight || 500) // Ambil tinggi kontainer secara dinamis
+  .width(container.clientWidth || 900)   
+  .height(container.clientHeight || 500) 
   .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')
   .bumpImageUrl(null)
   .polygonsData([]) 
@@ -162,11 +161,22 @@ const globe = Globe()
     return el;
   });
 
-// Load file GeoJSON Mataram Kuno ke Globe
+// SIMPAN CACHE DATA GEOJSON DI SINI AGAR BISA DIFILTER BERDASARKAN TAHUN
+let cachedGeoJsonFeatures = [];
+
+// Muat file GeoJSON Mataram Kuno dan simpan ke variabel cache
 fetch('geojson/mataram_kuno.geojson')
   .then(res => res.json())
   .then(geojson => {
-    globe.polygonsData(geojson.features);
+    // Berikan informasi rentang tahun langsung ke properti fitur GeoJSON jika belum ada di file-nya
+    cachedGeoJsonFeatures = geojson.features.map(feat => ({
+      ...feat,
+      start: feat.properties.start || 732, // Sesuaikan dengan tahun mulai dinasti
+      end: feat.properties.end || 1016     // Sesuaikan dengan tahun akhir dinasti
+    }));
+    
+    // Refresh tampilan awal setelah GeoJSON berhasil dimuat
+    updateApp(parseInt(document.getElementById('year-slider').value));
   })
   .catch(err => console.error("Gagal memuat GeoJSON Globe:", err));
 
@@ -195,15 +205,29 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
 }).addTo(map2D);
 
-// Muat GeoJSON langsung ke peta 2D agar tajam
+// Layer Group untuk menampung poligon 2D agar bisa dibersihkan/di-update dinamis
+const map2DLayerGroup = L.layerGroup().addTo(map2D);
+
+let cachedGeoJson2D = null;
 fetch('geojson/mataram_kuno.geojson')
   .then(res => res.json())
   .then(data => {
-    L.geoJSON(data, {
-      style: { color: "#ffffff", weight: 2, fillColor: "#ff8800", fillOpacity: 0.4 }
-    }).addTo(map2D);
+    cachedGeoJson2D = data;
   })
   .catch(err => console.error("Gagal memuat GeoJSON Leaflet:", err));
+
+// Fungsi pembantu untuk memperbarui peta 2D Leaflet sesuai tahun
+function updateMap2DByYear(currentYear) {
+  map2DLayerGroup.clearLayers();
+  if (!cachedGeoJson2D) return;
+
+  // Cek apakah tahun aktif berada dalam rentang Kerajaan Medang (contoh: 732 - 1016)
+  if (currentYear >= 732 && currentYear <= 1016) {
+    L.geoJSON(cachedGeoJson2D, {
+      style: { color: "#ffffff", weight: 2, fillColor: "#ff8800", fillOpacity: 0.4 }
+    }).addTo(map2DLayerGroup);
+  }
+}
 
 // --- PEMANTAU ZOOM OUT PETA 2D (KEMBALI KE GLOBE) ---
 map2D.on('zoom', () => {
@@ -221,12 +245,11 @@ map2D.on('zoom', () => {
 
       globe.pointOfView({ lat: -7.7956, lng: 110.3695, altitude: 0.4 }, 500);
       map2D.setView([-7.7956, 110.3695], 8);
-      currentActiveDynasty = null; // Reset status aktif
+      currentActiveDynasty = null; 
     }
   }
 });
 
-// --- PEMANTAU ZOOM IN MANUAL PADA GLOBE (DENGAN VALIDASI LOKASI) ---
 // --- PEMANTAU ZOOM IN MANUAL PADA GLOBE ---
 setInterval(() => {
   const pov = globe.pointOfView();
@@ -235,7 +258,6 @@ setInterval(() => {
 
   if (pov && globeElement && mapElement && globeElement.style.opacity === '1') {
     
-    // JIKA KURSOR BERADA DI ATAS SIDEBAR ATAU SLIDER, ABAIKAN PERUBAHAN ZOOM
     if (isCursorOverUI()) {
       return; 
     }
@@ -267,6 +289,18 @@ function updateApp(currentYear) {
   regionListDiv.innerHTML = '';
 
   let activeMarkers = [];
+  let activePolygons = [];
+
+  // Filter GeoJSON Globe berdasarkan tahun aktif di slider
+  if (cachedGeoJsonFeatures.length > 0) {
+    activePolygons = cachedGeoJsonFeatures.filter(feat => 
+      currentYear >= feat.start && currentYear <= feat.end
+    );
+  }
+  globe.polygonsData(activePolygons);
+
+  // Perbarui juga peta 2D Leaflet
+  updateMap2DByYear(currentYear);
 
   for (const [regionName, dynasties] of Object.entries(historicalData)) {
     const regionBox = document.createElement('div');
@@ -299,12 +333,11 @@ function updateApp(currentYear) {
         btn.style.borderRadius = '4px';
 
         // Event Klik Tombol Dinasti
-        // Event Klik Tombol Dinasti
         btn.onclick = () => {
           const globeElement = document.getElementById('globeViz');
           const mapElement = document.getElementById('map2D');
 
-          currentActiveDynasty = dynasty.id; // Catat dinasti yang sedang dipilih
+          currentActiveDynasty = dynasty.id; 
 
           if (dynasty.id === 'medang') {
             globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.15 }, 1500);
@@ -323,7 +356,6 @@ function updateApp(currentYear) {
               }
             }, 1500);
           } else {
-            // Jika klik dinasti selain Medang, paksa tutup peta 2D dan kembali ke globe
             if (globeElement && mapElement) {
               globeElement.style.opacity = '1';
               globeElement.style.pointerEvents = 'auto';
@@ -375,4 +407,3 @@ document.addEventListener("DOMContentLoaded", () => {
     mapElement.style.pointerEvents = 'none';
   }
 });
-

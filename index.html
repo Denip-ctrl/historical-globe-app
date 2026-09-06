@@ -38,7 +38,7 @@
   }
 
   #sidebar {
-    position: absolute;
+    position: fixed; /* Berubah jadi fixed agar tidak ikut bergeser saat halaman di-scroll */
     top: 20px;
     left: 20px;
     z-index: 10;
@@ -47,7 +47,7 @@
     color: white;
     padding: 15px;
     border-radius: 8px;
-    max-height: 70vh;
+    max-height: 85vh;
     overflow-y: auto;
   }
 
@@ -120,7 +120,26 @@
     </div>
 
   </div>
+<!-- Area untuk tulisan deskripsi & iklan di bawah peta -->
+    <div id="content-below-map">
+      <h3>Informasi & Sejarah Terkait</h3>
+      <p id="dynasty-description">Pilih dinasti atau geser tahun di atas untuk melihat detail sejarah Nusantara.</p>
+      
+      <div class="ad-section">
+        <span>[ Ruang Iklan / Banner Sponsor ]</span>
+      </div>
+    </div>
 
+  </div>
+
+  <!-- Pustaka Leaflet JS & Skrip Utama Anda -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
+
+  
 </body>
 
 </html>

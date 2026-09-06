@@ -2,13 +2,46 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Globe Sejarah Interaktif</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <style>
-    body { margin: 0; background: #000; font-family: sans-serif; overflow: hidden; }
-    #slider-container { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10; color: white; text-align: center; background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 8px; }
-    #sidebar { position: absolute; top: 20px; left: 20px; z-index: 10; width: 300px; background: rgba(0,0,0,0.8); color: white; padding: 15px; border-radius: 8px; max-height: 80vh; overflow-y: auto; }
-  </style>
+ <style>
+  html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    position: fixed;
+    background: #000;
+    font-family: sans-serif;
+  }
+  #slider-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    color: white;
+    text-align: center;
+    background: rgba(0,0,0,0.7);
+    padding: 10px 20px;
+    border-radius: 8px;
+  }
+  #sidebar {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    width: 300px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+</style>
   <!-- Pustaka Globe.gl dan Three.js -->
   <script src="https://unpkg.com/globe.gl"></script>
 </head>

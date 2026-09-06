@@ -111,6 +111,14 @@ const globe = Globe()
   // Gunakan file gambar tekstur tunggal yang cerah
   .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')
   .bumpImageUrl(null)
+
+  // TAMBAHKAN BAGIAN INI UNTUK POLIGON:
+  .polygonsData([]) 
+  .polygonAltitude(0.01) 
+  .polygonCapColor(() => 'rgba(0, 100, 255, 0.6)') 
+  .polygonSideColor(() => 'rgba(0, 100, 255, 0.2)')
+  .polygonStrokeColor(() => '#ffffff')
+  
   .htmlElementsData([])
   .htmlLat(d => d.lat)
   .htmlLng(d => d.lng)

@@ -115,7 +115,7 @@ const globe = Globe()
   // TAMBAHKAN BAGIAN INI UNTUK POLIGON:
   .polygonsData([]) 
   .polygonAltitude(0.01) 
-  .polygonCapColor(() => 'rgba(0, 100, 255, 0.6)') 
+  .polygonCapColor(() => 'rgba(0, 100, 255, 0.1)') 
   .polygonSideColor(() => 'rgba(0, 100, 255, 0.2)')
   .polygonStrokeColor(() => '#ffffff')
   

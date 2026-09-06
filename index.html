@@ -9,24 +9,67 @@
   <style>
   html, body {
     width: 100%;
-    height: 100%;
+    min-height: 100%;
     margin: 0;
     padding: 0;
-    overflow-x: hidden; /* Mencegah geser horizontal */
     background: #000;
     font-family: sans-serif;
+    color: white;
   }
 
-  /* Batasi ukuran kontainer utama peta/globe */
+  /* Layout utama menggunakan Flexbox agar kompak & responsif terhadap zoom */
+  #app-layout {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  #sidebar {
+    flex: 0 0 280px;
+    background: rgba(0,0,0,0.8);
+    padding: 15px;
+    border-radius: 8px;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: sticky;
+    top: 20px;
+    border: 1px solid #333;
+    box-sizing: border-box;
+  }
+
+  #main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 900px;
+    min-width: 0; /* Mencegah elemen keluar batas grid flex */
+  }
+
+  #slider-container {
+    margin-bottom: 15px;
+    text-align: center;
+    background: rgba(0,0,0,0.7);
+    padding: 10px 20px;
+    border-radius: 8px;
+    width: fit-content;
+  }
+
+  /* Kotak pembatas ukuran peta/globe */
   #map-container-wrapper {
     position: relative;
     width: 100%;
-    max-width: 900px; /* Lebar maksimal area peta */
-    height: 500px;     /* Tinggi tetap area peta */
-    margin: 20px auto 0 auto; /* Posisi di tengah bawah sidebar/header */
+    height: 450px;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    background: #111;
   }
 
   #globeViz, #map2D {
@@ -37,39 +80,14 @@
     height: 100%;
   }
 
-  #sidebar {
-    position: fixed; /* Berubah jadi fixed agar tidak ikut bergeser saat halaman di-scroll */
-    top: 20px;
-    left: 20px;
-    z-index: 10;
-    width: 280px;
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 15px;
-    border-radius: 8px;
-    max-height: 85vh;
-    overflow-y: auto;
-  }
-
-  #slider-container {
-    margin: 15px auto;
-    text-align: center;
-    color: white;
-    background: rgba(0,0,0,0.7);
-    padding: 10px 20px;
-    border-radius: 8px;
-    width: fit-content;
-  }
-
-  /* Area tambahan di bawah peta untuk tulisan dan iklan */
+  /* Area deskripsi & iklan di bawah peta */
   #content-below-map {
-    width: 90%;
-    max-width: 900px;
-    margin: 20px auto;
-    color: white;
+    width: 100%;
+    margin-top: 20px;
     padding: 20px;
     background: #111;
     border-radius: 8px;
+    box-sizing: border-box;
   }
 
   .ad-section {
@@ -88,58 +106,44 @@
 
 <body>
 
-  <div id="sidebar">
-    <h3>Navigasi Wilayah</h3>
-    <div id="region-list">
-      <!-- Daftar wilayah/dinasti -->
-    </div>
-  </div>
-
-  <!-- Bungkus utama peta agar ukurannya terbatas -->
-  <div style="margin-left: 320px; padding: 20px;">
+  <div id="app-layout">
     
-    <div id="slider-container">
-      <label>Tahun: <span id="year-label">1350</span></label><br>
-      <input type="range" id="year-slider" min="800" max="1970" value="1350" step="1" style="width: 250px;">
-    </div>
-
-    <!-- Kotak pembatas ukuran peta -->
-    <div id="map-container-wrapper">
-      <div id="globeViz"></div>
-      <div id="map2D" style="opacity: 0; pointer-events: none; transition: opacity 0.5s ease;"></div>
-    </div>
-
-    <!-- Area untuk tulisan deskripsi & iklan di bawah peta -->
-    <div id="content-below-map">
-      <h3>Informasi & Sejarah Terkait</h3>
-      <p id="dynasty-description">Pilih dinasti atau geser tahun di atas untuk melihat detail sejarah Nusantara.</p>
-      
-      <div class="ad-section">
-        <span>[ Ruang Iklan / Banner Sponsor ]</span>
+    <!-- Kolom Kiri: Sidebar Navigasi -->
+    <div id="sidebar">
+      <h3>Navigasi Wilayah</h3>
+      <div id="region-list">
+        <!-- Daftar wilayah/dinasti -->
       </div>
     </div>
 
-  </div>
-<!-- Area untuk tulisan deskripsi & iklan di bawah peta -->
-    <div id="content-below-map">
-      <h3>Informasi & Sejarah Terkait</h3>
-      <p id="dynasty-description">Pilih dinasti atau geser tahun di atas untuk melihat detail sejarah Nusantara.</p>
+    <!-- Kolom Kanan: Peta, Slider, dan Konten Bawah -->
+    <div id="main-content">
       
-      <div class="ad-section">
-        <span>[ Ruang Iklan / Banner Sponsor ]</span>
+      <div id="slider-container">
+        <label>Tahun: <span id="year-label">1350</span></label><br>
+        <input type="range" id="year-slider" min="800" max="1970" value="1350" step="1" style="width: 250px;">
       </div>
+
+      <div id="map-container-wrapper">
+        <div id="globeViz"></div>
+        <div id="map2D" style="opacity: 0; pointer-events: none; transition: opacity 0.5s ease;"></div>
+      </div>
+
+      <div id="content-below-map">
+        <h3>Informasi & Sejarah Terkait</h3>
+        <p id="dynasty-description">Pilih dinasti atau geser tahun di atas untuk melihat detail sejarah Nusantara.</p>
+        
+        <div class="ad-section">
+          <span>[ Ruang Iklan / Banner Sponsor ]</span>
+        </div>
+      </div>
+
     </div>
 
   </div>
 
-  <!-- Pustaka Leaflet JS & Skrip Utama Anda -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="app.js"></script>
 
 </body>
-</html>
-
-  
-</body>
-
 </html>

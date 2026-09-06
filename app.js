@@ -194,19 +194,17 @@ function updateApp(currentYear) {
         btn.style.textAlign = 'left';
         btn.style.borderRadius = '4px';
 
-        // Ketika tombol dinasti diklik: Arahkan kamera globe ke lokasinya
        // Ketika tombol dinasti diklik: Arahkan kamera globe ke lokasinya
-btn.onclick = () => {
-  // 1. Cek apakah yang diklik adalah Kerajaan Medang
+  btn.onclick = () => {
+  const globeElement = document.getElementById('globeViz');
+  const mapElement = document.getElementById('map2D');
+
   if (dynasty.id === 'medang') {
-    // Arahkan kamera globe mendekat ke lokasi Medang
+    // 1. Arahkan kamera globe mendekat ke lokasi Medang
     globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.15 }, 1500);
 
-    // 2. Setelah animasi zoom globe selesai, sembunyikan globe dan tampilkan peta datar
+    // 2. Sembunyikan globe, tampilkan peta datar setelah animasi selesai
     setTimeout(() => {
-      const globeElement = document.getElementById('globeViz');
-      const mapElement = document.getElementById('map2D');
-
       if (globeElement && mapElement) {
         globeElement.style.opacity = '0';
         globeElement.style.pointerEvents = 'none';
@@ -220,7 +218,16 @@ btn.onclick = () => {
       }
     }, 1500);
   } else {
-    // Untuk dinasti lain, cukup arahkan globe saja
+    // PENTING: Kembalikan globe dan sembunyikan peta 2D jika klik dinasti lain
+    if (globeElement && mapElement) {
+      globeElement.style.opacity = '1';
+      globeElement.style.pointerEvents = 'auto';
+      
+      mapElement.style.opacity = '0';
+      mapElement.style.pointerEvents = 'none';
+    }
+
+    // Untuk dinasti lain, arahkan globe ke lokasinya
     globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: dynasty.zoomAlt }, 1500);
   }
 

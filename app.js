@@ -202,10 +202,10 @@ btn.onclick = () => {
     // Arahkan kamera globe mendekat ke lokasi Medang
     globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.15 }, 1500);
 
-    // 2. Setelah animasi zoom globe selesai (misal 1.5 detik), sembunyikan globe dan tampilkan peta datar
+    // 2. Setelah animasi zoom globe selesai, sembunyikan globe dan tampilkan peta datar
     setTimeout(() => {
       const globeElement = document.getElementById('globeViz');
-      const mapElement = document.getElementById('map2D'); // Elemen peta datar Anda
+      const mapElement = document.getElementById('map2D');
 
       if (globeElement && mapElement) {
         globeElement.style.opacity = '0';
@@ -214,20 +214,19 @@ btn.onclick = () => {
         mapElement.style.opacity = '1';
         mapElement.style.pointerEvents = 'auto';
 
-        // Jika menggunakan Leaflet, panggil invalidateSize agar ukurannya pas
         if (typeof map2D !== 'undefined') {
           map2D.invalidateSize();
         }
       }
-    }, 1500); // Sesuaikan dengan durasi milidetik pointOfView
+    }, 1500);
   } else {
-    // Untuk dinasti lain yang belum pakai peta datar, cukup arahkan globe saja
+    // Untuk dinasti lain, cukup arahkan globe saja
     globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: dynasty.zoomAlt }, 1500);
   }
 
   console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
 };
-
+        
   // Contoh inisialisasi peta 2D (Leaflet)
 const map2D = L.map('map2D', { zoomControl: false }).setView([-7.7956, 110.3695], 8);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

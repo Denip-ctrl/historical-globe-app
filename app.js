@@ -286,7 +286,7 @@ setInterval(() => {
 
   // Jika di tahun tersebut sama sekali belum ada data
   if (activeMarkers.length === 0) {
-    regionListDiv.innerHTML = `<p style="color: #aaa; font-style: italic;">Data wilayah untuk tahun ${currentYear} belum tersedia di database prototype.</p>";`
+    regionListDiv.innerHTML = `<p style="color: #aaa; font-style: italic;">Data wilayah untuk tahun ${currentYear} belum tersedia di database prototype.</p>';
     globe.htmlElementsData([]); // Bersihkan marker di globe
   } else {
     // Perbarui penanda titik di globe 3D sesuai entitas yang aktif

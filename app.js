@@ -258,26 +258,7 @@ fetch('geojson/mataram_kuno.geojson')
     }).addTo(map2D);
   });
 
-  // Pantau pergerakan altitude globe
-setInterval(() => {
-  const pov = globe.pointOfView(); // Mendapatkan { lat, lng, altitude }
-  const globeElement = document.getElementById('globeViz');
-  const mapElement = document.getElementById('map2D');
-
-  if (pov.altitude < 0.25) {
-    // Jika sudah sangat dekat, fade out globe, fade in peta 2D datar
-    globeElement.style.opacity = '0';
-    globeElement.style.pointerEvents = 'none';
-    mapElement.style.opacity = '1';
-    mapElement.style.pointerEvents = 'auto';
-  } else {
-    // Kembalikan ke globe jika di-zoom out
-    globeElement.style.opacity = '1';
-    globeElement.style.pointerEvents = 'auto';
-    mapElement.style.opacity = '0';
-    mapElement.style.pointerEvents = 'none';
-  }
-}, 200);
+  
   
   console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
 };

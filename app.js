@@ -144,7 +144,6 @@ window.addEventListener('resize', () => {
   globe.height(window.innerHeight);
 });
 
-
 // --- 3. INISIALISASI PETA 2D (LEAFLET) DI LUAR (GLOBAL) ---
 const map2D = L.map('map2D', { zoomControl: false }).setView([-7.7956, 110.3695], 8);
 
@@ -161,6 +160,31 @@ fetch('geojson/mataram_kuno.geojson')
     }).addTo(map2D);
   })
   .catch(err => console.error("Gagal memuat GeoJSON Leaflet:", err));
+
+// --- TAMBAHKAN LOGIKA ZOOM OUT DI SINI ---
+map2D.on('zoom', () => {
+  const currentZoom = map2D.getZoom();
+  // Jika pengguna melakukan zoom out di peta 2D hingga di bawah level 7 (sesuaikan selera)
+  if (currentZoom < 7) {
+    const globeElement = document.getElementById('globeViz');
+    const mapElement = document.getElementById('map2D');
+
+    if (globeElement && mapElement) {
+      // Kembalikan tampilan ke Globe 3D secara mulus
+      globeElement.style.opacity = '1';
+      globeElement.style.pointerEvents = 'auto';
+      
+      mapElement.style.opacity = '0';
+      mapElement.style.pointerEvents = 'none';
+
+      // Sinkronkan posisi kamera globe kembali ke posisi Medang dengan altitude transisi
+      globe.pointOfView({ lat: -7.7956, lng: 110.3695, altitude: 0.15 }, 500);
+      
+      // Reset zoom peta 2D ke posisi awal agar siap jika dibuka lagi nanti
+      map2D.setView([-7.7956, 110.3695], 8);
+    }
+  }
+});
 
 
 // --- 4. ELEMEN UI DOM & RENDER APLIKASI ---

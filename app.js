@@ -195,12 +195,20 @@ function updateApp(currentYear) {
         btn.style.borderRadius = '4px';
 
         // Ketika tombol dinasti diklik: Arahkan kamera globe ke lokasinya
-        btn.onclick = () => {
-          globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: dynasty.zoomAlt }, 1500);
-          
-          // Opsional: Tampilkan detail informasi di konsol atau buat panel info khusus
-          console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
-        };
+       // Ketika tombol dinasti diklik: Arahkan kamera globe ke lokasinya
+btn.onclick = () => {
+  // Gunakan altitude yang pas (misal 0.5 atau 0.8) agar posisinya ideal (tidak terlalu dekat/kuning pekat, tapi tidak terlalu jauh)
+  globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.6 }, 1500);
+  
+  // Jika Anda ingin memuat atau menampilkan polygon khusus saat tombol diklik:
+  fetch('geojson/mataram_kuno.geojson')
+    .then(res => res.json())
+    .then(geojson => {
+      globe.polygonsData(geojson.features);
+    });
+
+  console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
+};
 
         regionBox.appendChild(btn);
       }

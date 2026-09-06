@@ -120,6 +120,15 @@ const globe = Globe()
     return el;
   });
 
+// Load file GeoJSON Mataram Kuno
+fetch('geojson/mataram_kuno.geojson')
+  .then(res => res.json())
+  .then(geojson => {
+    // Masukkan data poligon ke globe
+    globe.polygonsData(geojson.features);
+  })
+  .catch(err => console.error("Gagal memuat GeoJSON:", err));
+
 // Mengatur pencahayaan agar lebih terang merata menggunakan fungsi internal globe
 const directionalLight = globe.scene().getObjectByProperty('type', 'DirectionalLight');
 if (directionalLight) {

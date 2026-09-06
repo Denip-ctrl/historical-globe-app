@@ -104,6 +104,41 @@ const historicalData = {
   ]
 };
 
+// --- 1. LACAK POSISI KURSOR MOUSE ---
+let mouseX = 0;
+let mouseY = 0;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+// Fungsi pembantu untuk mengecek apakah kursor sedang berada di atas elemen UI (Sidebar / Slider)
+function isCursorOverUI() {
+  const sidebar = document.getElementById('sidebar');
+  const slider = document.getElementById('slider-container');
+  
+  const rectSidebar = sidebar.getBoundingClientRect();
+  const rectSlider = slider.getBoundingClientRect();
+
+  const overSidebar = (
+    mouseX >= rectSidebar.left &&
+    mouseX <= rectSidebar.right &&
+    mouseY >= rectSidebar.top &&
+    mouseY <= rectSidebar.bottom
+  );
+
+  const overSlider = (
+    mouseX >= rectSlider.left &&
+    mouseX <= rectSlider.right &&
+    mouseX >= rectSlider.top &&
+    mouseY <= rectSlider.bottom // Perbaikan kecil pada pengecekan bawah slider
+  );
+
+  return overSidebar || overSlider;
+}
+
+
 // --- 2. INISIALISASI GLOBE 3D ---
 const container = document.getElementById('globeViz');
 const globe = Globe()
@@ -186,24 +221,22 @@ map2D.on('zoom', () => {
 });
 
 // --- PEMANTAU ZOOM IN MANUAL PADA GLOBE (DENGAN VALIDASI LOKASI) ---
-// --- PEMANTAU ZOOM IN MANUAL PADA GLOBE (DENGAN BATASAN AREA KURSOR) ---
+// --- PEMANTAU ZOOM IN MANUAL PADA GLOBE ---
 setInterval(() => {
   const pov = globe.pointOfView();
   const globeElement = document.getElementById('globeViz');
   const mapElement = document.getElementById('map2D');
 
   if (pov && globeElement && mapElement && globeElement.style.opacity === '1') {
-    // Pastikan kursor sedang berada di atas elemen globeViz atau body utama, 
-    // dan bukan di atas sidebar atau elemen UI luar.
-    const activeElement = document.activeElement;
-    const isOverSidebar = document.getElementById('sidebar').matches(':hover');
-    const isOverSlider = document.getElementById('slider-container').matches(':hover');
+    
+    // JIKA KURSOR BERADA DI ATAS SIDEBAR ATAU SLIDER, ABAIKAN PERUBAHAN ZOOM
+    if (isCursorOverUI()) {
+      return; 
+    }
 
-    // Validasi lokasi koordinat sekitar Medang
     const isNearMedang = Math.abs(pov.lat - (-7.7956)) < 10 && Math.abs(pov.lng - 110.3695) < 10;
 
-    // Hanya picu perpindahan jika kursor TIDAK sedang di sidebar/slider, posisinya dekat Medang, dan altitudenya dekat
-    if (!isOverSidebar && !isOverSlider && pov.altitude < 0.25 && isNearMedang && currentActiveDynasty === 'medang') {
+    if (pov.altitude < 0.25 && isNearMedang && currentActiveDynasty === 'medang') {
       globeElement.style.opacity = '0';
       globeElement.style.pointerEvents = 'none';
       
@@ -216,6 +249,7 @@ setInterval(() => {
     }
   }
 }, 300);
+
 
 // --- 4. ELEMEN UI DOM & RENDER APLIKASI ---
 const yearSlider = document.getElementById('year-slider');

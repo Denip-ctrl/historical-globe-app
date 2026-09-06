@@ -197,8 +197,36 @@ function updateApp(currentYear) {
         // Ketika tombol dinasti diklik: Arahkan kamera globe ke lokasinya
        // Ketika tombol dinasti diklik: Arahkan kamera globe ke lokasinya
 btn.onclick = () => {
-  // Gunakan altitude yang pas (misal 0.5 atau 0.8) agar posisinya ideal (tidak terlalu dekat/kuning pekat, tapi tidak terlalu jauh)
-  globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.6 }, 1500);
+  // 1. Cek apakah yang diklik adalah Kerajaan Medang
+  if (dynasty.id === 'medang') {
+    // Arahkan kamera globe mendekat ke lokasi Medang
+    globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.15 }, 1500);
+
+    // 2. Setelah animasi zoom globe selesai (misal 1.5 detik), sembunyikan globe dan tampilkan peta datar
+    setTimeout(() => {
+      const globeElement = document.getElementById('globeViz');
+      const mapElement = document.getElementById('map2D'); // Elemen peta datar Anda
+
+      if (globeElement && mapElement) {
+        globeElement.style.opacity = '0';
+        globeElement.style.pointerEvents = 'none';
+        
+        mapElement.style.opacity = '1';
+        mapElement.style.pointerEvents = 'auto';
+
+        // Jika menggunakan Leaflet, panggil invalidateSize agar ukurannya pas
+        if (typeof map2D !== 'undefined') {
+          map2D.invalidateSize();
+        }
+      }
+    }, 1500); // Sesuaikan dengan durasi milidetik pointOfView
+  } else {
+    // Untuk dinasti lain yang belum pakai peta datar, cukup arahkan globe saja
+    globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: dynasty.zoomAlt }, 1500);
+  }
+
+  console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
+};
 
   // Contoh inisialisasi peta 2D (Leaflet)
 const map2D = L.map('map2D', { zoomControl: false }).setView([-7.7956, 110.3695], 8);

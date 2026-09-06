@@ -199,6 +199,12 @@ function updateApp(currentYear) {
 btn.onclick = () => {
   // Gunakan altitude yang pas (misal 0.5 atau 0.8) agar posisinya ideal (tidak terlalu dekat/kuning pekat, tapi tidak terlalu jauh)
   globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.6 }, 1500);
+
+  // Contoh inisialisasi peta 2D (Leaflet)
+const map2D = L.map('map2D', { zoomControl: false }).setView([-7.7956, 110.3695], 8);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+}).addTo(map2D);
   
   // Jika Anda ingin memuat atau menampilkan polygon khusus saat tombol diklik:
   fetch('geojson/mataram_kuno.geojson')
@@ -207,6 +213,36 @@ btn.onclick = () => {
       globe.polygonsData(geojson.features);
     });
 
+  // Muat GeoJSON langsung ke peta 2D agar posisinya akurat dan tajam
+fetch('geojson/mataram_kuno.geojson')
+  .then(res => res.json())
+  .then(data => {
+    L.geoJSON(data, {
+      style: { color: "#ffffff", weight: 2, fillColor: "#ff8800", fillOpacity: 0.4 }
+    }).addTo(map2D);
+  });
+
+  // Pantau pergerakan altitude globe
+setInterval(() => {
+  const pov = globe.pointOfView(); // Mendapatkan { lat, lng, altitude }
+  const globeElement = document.getElementById('globeViz');
+  const mapElement = document.getElementById('map2D');
+
+  if (pov.altitude < 0.25) {
+    // Jika sudah sangat dekat, fade out globe, fade in peta 2D datar
+    globeElement.style.opacity = '0';
+    globeElement.style.pointerEvents = 'none';
+    mapElement.style.opacity = '1';
+    mapElement.style.pointerEvents = 'auto';
+  } else {
+    // Kembalikan ke globe jika di-zoom out
+    globeElement.style.opacity = '1';
+    globeElement.style.pointerEvents = 'auto';
+    mapElement.style.opacity = '0';
+    mapElement.style.pointerEvents = 'none';
+  }
+}, 200);
+  
   console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
 };
 

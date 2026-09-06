@@ -144,6 +144,9 @@ window.addEventListener('resize', () => {
   globe.height(window.innerHeight);
 });
 
+// --- TAMBAHKAN VARIABEL STATUS DI BAGIAN ATAS ---
+let currentActiveDynasty = null;
+
 // --- 3. INISIALISASI PETA 2D (LEAFLET) DI LUAR (GLOBAL) ---
 const map2D = L.map('map2D', { zoomControl: false }).setView([-7.7956, 110.3695], 8);
 
@@ -177,26 +180,32 @@ map2D.on('zoom', () => {
 
       globe.pointOfView({ lat: -7.7956, lng: 110.3695, altitude: 0.4 }, 500);
       map2D.setView([-7.7956, 110.3695], 8);
+      currentActiveDynasty = null; // Reset status aktif
     }
   }
 });
 
-// --- PEMANTAU ZOOM IN MANUAL PADA GLOBE ---
+// --- PEMANTAU ZOOM IN MANUAL PADA GLOBE (DENGAN VALIDASI LOKASI) ---
 setInterval(() => {
   const pov = globe.pointOfView();
   const globeElement = document.getElementById('globeViz');
   const mapElement = document.getElementById('map2D');
 
-  // Jika pengguna melakukan zoom in manual hingga altitude < 0.25 dan peta 2D sedang tersembunyi
-  if (pov && pov.altitude < 0.25 && globeElement && mapElement && globeElement.style.opacity === '1') {
-    globeElement.style.opacity = '0';
-    globeElement.style.pointerEvents = 'none';
-    
-    mapElement.style.opacity = '1';
-    mapElement.style.pointerEvents = 'auto';
+  if (pov && globeElement && mapElement && globeElement.style.opacity === '1') {
+    // Validasi: Apakah kamera sedang melihat area sekitar Jawa / Medang? (lat: -7.7, lng: 110.3)
+    const isNearMedang = Math.abs(pov.lat - (-7.7956)) < 10 && Math.abs(pov.lng - 110.3695) < 10;
 
-    if (typeof map2D !== 'undefined') {
-      map2D.invalidateSize();
+    // Hanya buka peta 2D jika posisinya dekat Medang, altitudenya dekat, dan status dinasti aktif adalah Medang
+    if (pov.altitude < 0.25 && isNearMedang && currentActiveDynasty === 'medang') {
+      globeElement.style.opacity = '0';
+      globeElement.style.pointerEvents = 'none';
+      
+      mapElement.style.opacity = '1';
+      mapElement.style.pointerEvents = 'auto';
+
+      if (typeof map2D !== 'undefined') {
+        map2D.invalidateSize();
+      }
     }
   }
 }, 300);
@@ -244,42 +253,43 @@ function updateApp(currentYear) {
 
         // Event Klik Tombol Dinasti
         // Event Klik Tombol Dinasti
-btn.onclick = () => {
-  const globeElement = document.getElementById('globeViz');
-  const mapElement = document.getElementById('map2D');
+        btn.onclick = () => {
+          const globeElement = document.getElementById('globeViz');
+          const mapElement = document.getElementById('map2D');
 
-  if (dynasty.id === 'medang') {
-    // Klik Medang memicu zoom otomatis ke posisi transisi
-    globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.15 }, 1500);
+          currentActiveDynasty = dynasty.id; // Catat dinasti yang sedang dipilih
 
-    setTimeout(() => {
-      if (globeElement && mapElement) {
-        globeElement.style.opacity = '0';
-        globeElement.style.pointerEvents = 'none';
-        
-        mapElement.style.opacity = '1';
-        mapElement.style.pointerEvents = 'auto';
+          if (dynasty.id === 'medang') {
+            globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.15 }, 1500);
 
-        if (typeof map2D !== 'undefined') {
-          map2D.invalidateSize();
-        }
-      }
-    }, 1500);
-  } else {
-    // Klik dinasti lain otomatis menutup peta 2D dan mengembalikan globe
-    if (globeElement && mapElement) {
-      globeElement.style.opacity = '1';
-      globeElement.style.pointerEvents = 'auto';
-      
-      mapElement.style.opacity = '0';
-      mapElement.style.pointerEvents = 'none';
-    }
+            setTimeout(() => {
+              if (globeElement && mapElement) {
+                globeElement.style.opacity = '0';
+                globeElement.style.pointerEvents = 'none';
+                
+                mapElement.style.opacity = '1';
+                mapElement.style.pointerEvents = 'auto';
 
-    globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: dynasty.zoomAlt }, 1500);
-  }
+                if (typeof map2D !== 'undefined') {
+                  map2D.invalidateSize();
+                }
+              }
+            }, 1500);
+          } else {
+            // Jika klik dinasti selain Medang, paksa tutup peta 2D dan kembali ke globe
+            if (globeElement && mapElement) {
+              globeElement.style.opacity = '1';
+              globeElement.style.pointerEvents = 'auto';
+              
+              mapElement.style.opacity = '0';
+              mapElement.style.pointerEvents = 'none';
+            }
 
-  console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
-};
+            globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: dynasty.zoomAlt }, 1500);
+          }
+
+          console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
+        };
         
         regionBox.appendChild(btn);
       }
@@ -318,3 +328,21 @@ document.addEventListener("DOMContentLoaded", () => {
     mapElement.style.pointerEvents = 'none';
   }
 });
+
+function updateApp(currentYear) {
+  yearLabel.innerText = currentYear;
+  regionListDiv.innerHTML = '';
+
+  // Jika tahun digeser keluar dari rentang Medang (732-1016), paksa tutup peta 2D
+  if ((currentYear < 732 || currentYear > 1016) && currentActiveDynasty === 'medang') {
+    currentActiveDynasty = null;
+    const gEl = document.getElementById('globeViz');
+    const mEl = document.getElementById('map2D');
+    if (gEl && mEl) {
+      gEl.style.opacity = '1';
+      gEl.style.pointerEvents = 'auto';
+      mEl.style.opacity = '0';
+      mEl.style.pointerEvents = 'none';
+    }
+  }
+  // ... (lanjutan kode perulangan database berikutnya)

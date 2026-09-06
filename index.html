@@ -5,65 +5,122 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Globe Sejarah Interaktif</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
- <style>
+
+  <style>
   html, body {
     width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden;
-    position: fixed;
+    overflow-x: hidden; /* Mencegah geser horizontal */
     background: #000;
     font-family: sans-serif;
   }
-  #slider-container {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    color: white;
-    text-align: center;
-    background: rgba(0,0,0,0.7);
-    padding: 10px 20px;
+
+  /* Batasi ukuran kontainer utama peta/globe */
+  #map-container-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 900px; /* Lebar maksimal area peta */
+    height: 500px;     /* Tinggi tetap area peta */
+    margin: 20px auto 0 auto; /* Posisi di tengah bawah sidebar/header */
     border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   }
+
+  #globeViz, #map2D {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
   #sidebar {
     position: absolute;
     top: 20px;
     left: 20px;
     z-index: 10;
-    width: 300px;
+    width: 280px;
     background: rgba(0,0,0,0.8);
     color: white;
     padding: 15px;
     border-radius: 8px;
-    max-height: 80vh;
+    max-height: 70vh;
     overflow-y: auto;
   }
+
+  #slider-container {
+    margin: 15px auto;
+    text-align: center;
+    color: white;
+    background: rgba(0,0,0,0.7);
+    padding: 10px 20px;
+    border-radius: 8px;
+    width: fit-content;
+  }
+
+  /* Area tambahan di bawah peta untuk tulisan dan iklan */
+  #content-below-map {
+    width: 90%;
+    max-width: 900px;
+    margin: 20px auto;
+    color: white;
+    padding: 20px;
+    background: #111;
+    border-radius: 8px;
+  }
+
+  .ad-section {
+    margin-top: 20px;
+    padding: 15px;
+    background: #222;
+    text-align: center;
+    border: 1px dashed #555;
+    color: #aaa;
+  }
 </style>
+  
   <!-- Pustaka Globe.gl dan Three.js -->
   <script src="https://unpkg.com/globe.gl"></script>
 </head>
+
 <body>
 
   <div id="sidebar">
     <h3>Navigasi Wilayah</h3>
     <div id="region-list">
-      <!-- Daftar wilayah dan dinasti akan muncul di sini via JavaScript -->
+      <!-- Daftar wilayah/dinasti -->
     </div>
   </div>
 
-  <div id="slider-container">
-    <label>Tahun: <span id="year-label">1350</span></label><br>
-    <input type="range" id="year-slider" min="800" max="1970" value="1350" step="1" style="width: 300px;">
+  <!-- Bungkus utama peta agar ukurannya terbatas -->
+  <div style="margin-left: 320px; padding: 20px;">
+    
+    <div id="slider-container">
+      <label>Tahun: <span id="year-label">1350</span></label><br>
+      <input type="range" id="year-slider" min="800" max="1970" value="1350" step="1" style="width: 250px;">
+    </div>
+
+    <!-- Kotak pembatas ukuran peta -->
+    <div id="map-container-wrapper">
+      <div id="globeViz"></div>
+      <div id="map2D" style="opacity: 0; pointer-events: none; transition: opacity 0.5s ease;"></div>
+    </div>
+
+    <!-- Area untuk tulisan deskripsi & iklan di bawah peta -->
+    <div id="content-below-map">
+      <h3>Informasi & Sejarah Terkait</h3>
+      <p id="dynasty-description">Pilih dinasti atau geser tahun di atas untuk melihat detail sejarah Nusantara.</p>
+      
+      <div class="ad-section">
+        <span>[ Ruang Iklan / Banner Sponsor ]</span>
+      </div>
+    </div>
+
   </div>
 
-  <div id="globeViz" style="position: absolute; width: 100vw; height: 100vh; z-index: 1;"></div>
-  <div id="map2D" style="position: absolute; width: 100vw; height: 100vh; z-index: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s ease;"></div>
-  
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  
-  <script src="app.js"></script>
 </body>
+
 </html>

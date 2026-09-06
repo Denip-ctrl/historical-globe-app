@@ -186,17 +186,24 @@ map2D.on('zoom', () => {
 });
 
 // --- PEMANTAU ZOOM IN MANUAL PADA GLOBE (DENGAN VALIDASI LOKASI) ---
+// --- PEMANTAU ZOOM IN MANUAL PADA GLOBE (DENGAN BATASAN AREA KURSOR) ---
 setInterval(() => {
   const pov = globe.pointOfView();
   const globeElement = document.getElementById('globeViz');
   const mapElement = document.getElementById('map2D');
 
   if (pov && globeElement && mapElement && globeElement.style.opacity === '1') {
-    // Validasi: Apakah kamera sedang melihat area sekitar Jawa / Medang? (lat: -7.7, lng: 110.3)
+    // Pastikan kursor sedang berada di atas elemen globeViz atau body utama, 
+    // dan bukan di atas sidebar atau elemen UI luar.
+    const activeElement = document.activeElement;
+    const isOverSidebar = document.getElementById('sidebar').matches(':hover');
+    const isOverSlider = document.getElementById('slider-container').matches(':hover');
+
+    // Validasi lokasi koordinat sekitar Medang
     const isNearMedang = Math.abs(pov.lat - (-7.7956)) < 10 && Math.abs(pov.lng - 110.3695) < 10;
 
-    // Hanya buka peta 2D jika posisinya dekat Medang, altitudenya dekat, dan status dinasti aktif adalah Medang
-    if (pov.altitude < 0.25 && isNearMedang && currentActiveDynasty === 'medang') {
+    // Hanya picu perpindahan jika kursor TIDAK sedang di sidebar/slider, posisinya dekat Medang, dan altitudenya dekat
+    if (!isOverSidebar && !isOverSlider && pov.altitude < 0.25 && isNearMedang && currentActiveDynasty === 'medang') {
       globeElement.style.opacity = '0';
       globeElement.style.pointerEvents = 'none';
       

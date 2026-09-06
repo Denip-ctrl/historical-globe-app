@@ -329,20 +329,3 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-function updateApp(currentYear) {
-  yearLabel.innerText = currentYear;
-  regionListDiv.innerHTML = '';
-
-  // Jika tahun digeser keluar dari rentang Medang (732-1016), paksa tutup peta 2D
-  if ((currentYear < 732 || currentYear > 1016) && currentActiveDynasty === 'medang') {
-    currentActiveDynasty = null;
-    const gEl = document.getElementById('globeViz');
-    const mEl = document.getElementById('map2D');
-    if (gEl && mEl) {
-      gEl.style.opacity = '1';
-      gEl.style.pointerEvents = 'auto';
-      mEl.style.opacity = '0';
-      mEl.style.pointerEvents = 'none';
-    }
-  }
-  // ... (lanjutan kode perulangan database berikutnya)

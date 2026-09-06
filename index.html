@@ -3,139 +3,238 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Globe Sejarah Interaktif</title>
+  <title>Global History - Peta Sejarah Interaktif</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-
-  <style>
-  html, body {
-    width: 100%;
-    min-height: 100%;
-    margin: 0;
-    padding: 0;
-    background: #000;
-    font-family: sans-serif;
-    color: white;
-  }
-
-  /* Layout utama menggunakan Flexbox agar kompak & responsif terhadap zoom */
-  #app-layout {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 20px;
-    max-width: 1250px;
-    margin: 0 auto;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-
-  #sidebar {
-    flex: 0 0 280px;
-    background: rgba(0,0,0,0.8);
-    padding: 15px;
-    border-radius: 8px;
-    max-height: 85vh;
-    overflow-y: auto;
-    position: sticky;
-    top: 20px;
-    border: 1px solid #333;
-    box-sizing: border-box;
-  }
-
-  #main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 900px;
-    min-width: 0; /* Mencegah elemen keluar batas grid flex */
-  }
-
-  #slider-container {
-    margin-bottom: 15px;
-    text-align: center;
-    background: rgba(0,0,0,0.7);
-    padding: 10px 20px;
-    border-radius: 8px;
-    width: fit-content;
-  }
-
-  /* Kotak pembatas ukuran peta/globe */
-  #map-container-wrapper {
-    position: relative;
-    width: 100%;
-    height: 450px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    background: #111;
-  }
-
-  #globeViz, #map2D {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Area deskripsi & iklan di bawah peta */
-  #content-below-map {
-    width: 100%;
-    margin-top: 20px;
-    padding: 20px;
-    background: #111;
-    border-radius: 8px;
-    box-sizing: border-box;
-  }
-
-  .ad-section {
-    margin-top: 20px;
-    padding: 15px;
-    background: #222;
-    text-align: center;
-    border: 1px dashed #555;
-    color: #aaa;
-  }
-</style>
   
-  <!-- Pustaka Globe.gl dan Three.js -->
+  <style>
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #000;
+      font-family: sans-serif;
+      color: white;
+    }
+
+    /* Header Utama */
+    header {
+      text-align: center;
+      padding: 20px 0 10px 0;
+      border-bottom: 1px solid #222;
+      background: #050505;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 1px;
+      color: #f0f0f0;
+    }
+
+    /* Layout Utama (Responsif: Kolom untuk Desktop, Baris Bertumpuk untuk HP) */
+    #app-layout {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      max-width: 1250px;
+      margin: 20px auto;
+      padding: 0 15px;
+      box-sizing: border-box;
+    }
+
+    /* Sidebar Navigasi Wilayah */
+    #sidebar {
+      flex: 0 0 280px;
+      background: rgba(15,15,15,0.9);
+      padding: 15px;
+      border-radius: 8px;
+      max-height: 85vh;
+      overflow-y: auto;
+      position: sticky;
+      top: 20px;
+      border: 1px solid #333;
+      box-sizing: border-box;
+    }
+
+    /* Konten Utama Kanan */
+    #main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 900px;
+      min-width: 0;
+    }
+
+    /* Kotak Peta / Globe */
+    #map-container-wrapper {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      background: #111;
+    }
+
+    #globeViz, #map2D {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Slider Linimasa (Diletakkan Tepat di Bawah Peta) */
+    #slider-container {
+      margin-top: 15px;
+      margin-bottom: 15px;
+      text-align: center;
+      background: rgba(20,20,20,0.8);
+      padding: 10px 20px;
+      border-radius: 8px;
+      width: fit-content;
+      border: 1px solid #333;
+    }
+
+    /* Keterangan Wilayah, Raja, Peninggalan di Bawah Peta */
+    #info-section {
+      width: 100%;
+      margin-top: 20px;
+      padding: 20px;
+      background: #111;
+      border-radius: 8px;
+      box-sizing: border-box;
+      border: 1px solid #222;
+    }
+
+    #info-section h3 {
+      margin-top: 0;
+      color: #ffaa00;
+      border-bottom: 1px solid #333;
+      padding-bottom: 8px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .info-card {
+      background: #181818;
+      padding: 12px;
+      border-radius: 6px;
+      border-left: 3px solid #ffaa00;
+    }
+
+    .info-card h4 {
+      margin: 0 0 5px 0;
+      font-size: 13px;
+      color: #aaa;
+      text-transform: uppercase;
+    }
+
+    .info-card p {
+      margin: 0;
+      color: #fff;
+    }
+
+    /* Area Iklan Aman di Bagian Bawah */
+    .ad-section {
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      background: #161616;
+      text-align: center;
+      border: 1px dashed #444;
+      border-radius: 8px;
+      color: #777;
+      box-sizing: border-box;
+    }
+
+    /* Responsif untuk Layar HP / Mobile */
+    @media (max-width: 768px) {
+      #app-layout {
+        flex-direction: column;
+        padding: 10px;
+      }
+      #sidebar {
+        position: relative;
+        top: 0;
+        width: 100%;
+        max-height: 200px;
+        margin-bottom: 15px;
+      }
+      #map-container-wrapper {
+        height: 380px;
+      }
+    }
+  </style>
+
   <script src="https://unpkg.com/globe.gl"></script>
 </head>
-
 <body>
+
+  <!-- Header Judul Utama -->
+  <header>
+    <h1>Global History</h1>
+  </header>
 
   <div id="app-layout">
     
-    <!-- Kolom Kiri: Sidebar Navigasi -->
+    <!-- Sidebar Navigasi Wilayah -->
     <div id="sidebar">
       <h3>Navigasi Wilayah</h3>
       <div id="region-list">
-        <!-- Daftar wilayah/dinasti -->
+        <!-- Daftar dinasti / wilayah dimuat via JavaScript -->
       </div>
     </div>
 
-    <!-- Kolom Kanan: Peta, Slider, dan Konten Bawah -->
+    <!-- Konten Utama (Peta, Slider, Info, & Iklan) -->
     <div id="main-content">
       
-      <div id="slider-container">
-        <label>Tahun: <span id="year-label">1350</span></label><br>
-        <input type="range" id="year-slider" min="800" max="1970" value="1350" step="1" style="width: 250px;">
-      </div>
-
+      <!-- Kotak Peta / Globe 3D & 2D -->
       <div id="map-container-wrapper">
         <div id="globeViz"></div>
         <div id="map2D" style="opacity: 0; pointer-events: none; transition: opacity 0.5s ease;"></div>
       </div>
 
-      <div id="content-below-map">
-        <h3>Informasi & Sejarah Terkait</h3>
-        <p id="dynasty-description">Pilih dinasti atau geser tahun di atas untuk melihat detail sejarah Nusantara.</p>
+      <!-- Slider Linimasa -->
+      <div id="slider-container">
+        <label>Tahun: <span id="year-label">1350</span></label><br>
+        <input type="range" id="year-slider" min="800" max="1970" value="1350" step="1" style="width: 250px;">
+      </div>
+
+      <!-- Informasi Wilayah / Raja / Peristiwa di Bawah Peta -->
+      <div id="info-section">
+        <h3 id="dynasty-title">Pilih Wilayah atau Era Sejarah</h3>
+        <p id="dynasty-description">Geser linimasa di atas atau pilih wilayah dari navigasi untuk memunculkan detail catatan sejarah.</p>
         
-        <div class="ad-section">
-          <span>[ Ruang Iklan / Banner Sponsor ]</span>
+        <div class="info-grid">
+          <div class="info-card">
+            <h4>Penguasa / Raja</h4>
+            <p id="info-ruler">-</p>
+          </div>
+          <div class="info-card">
+            <h4>Peninggalan / Situs</h4>
+            <p id="info-relics">-</p>
+          </div>
+          <div class="info-card">
+            <h4>Peristiwa Penting</h4>
+            <p id="info-events">-</p>
+          </div>
         </div>
+      </div>
+
+      <!-- Ruang Iklan -->
+      <div class="ad-section">
+        <span>[ Ruang Iklan / Banner Sponsor ]</span>
       </div>
 
     </div>
@@ -144,6 +243,5 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="app.js"></script>
-
 </body>
 </html>

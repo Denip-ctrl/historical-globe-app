@@ -195,15 +195,16 @@ function updateApp(currentYear) {
         btn.style.borderRadius = '4px';
 
        // Ketika tombol dinasti diklik: Arahkan kamera globe ke lokasinya
-  btn.onclick = () => {
+// --- 1. EVENT KLIK TOMBOL DINASTI ---
+btn.onclick = () => {
   const globeElement = document.getElementById('globeViz');
   const mapElement = document.getElementById('map2D');
 
   if (dynasty.id === 'medang') {
-    // 1. Arahkan kamera globe mendekat ke lokasi Medang
+    // Arahkan kamera globe mendekat ke lokasi Medang
     globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: 0.15 }, 1500);
 
-    // 2. Sembunyikan globe, tampilkan peta datar setelah animasi selesai
+    // Setelah animasi zoom globe selesai, sembunyikan globe dan tampilkan peta datar
     setTimeout(() => {
       if (globeElement && mapElement) {
         globeElement.style.opacity = '0';
@@ -218,7 +219,7 @@ function updateApp(currentYear) {
       }
     }, 1500);
   } else {
-    // PENTING: Kembalikan globe dan sembunyikan peta 2D jika klik dinasti lain
+    // Kembalikan globe dan sembunyikan peta 2D jika klik dinasti lain
     if (globeElement && mapElement) {
       globeElement.style.opacity = '1';
       globeElement.style.pointerEvents = 'auto';
@@ -227,27 +228,28 @@ function updateApp(currentYear) {
       mapElement.style.pointerEvents = 'none';
     }
 
-    // Untuk dinasti lain, arahkan globe ke lokasinya
     globe.pointOfView({ lat: dynasty.lat, lng: dynasty.lng, altitude: dynasty.zoomAlt }, 1500);
   }
 
   console.log(`Menampilkan detail: ${dynasty.name} - ${dynasty.desc}`);
-};
-        
-  // Contoh inisialisasi peta 2D (Leaflet)
+}; // <-- Pastikan titik koma dan kurung tutup ini ada di sini!
+
+
+// --- 2. INISIALISASI PETA 2D & FETCH DATA ---
 const map2D = L.map('map2D', { zoomControl: false }).setView([-7.7956, 110.3695], 8);
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
 }).addTo(map2D);
-  
-  // Jika Anda ingin memuat atau menampilkan polygon khusus saat tombol diklik:
-  fetch('geojson/mataram_kuno.geojson')
-    .then(res => res.json())
-    .then(geojson => {
-      globe.polygonsData(geojson.features);
-    });
 
-  // Muat GeoJSON langsung ke peta 2D agar posisinya akurat dan tajam
+// Muat GeoJSON untuk Globe 3D
+fetch('geojson/mataram_kuno.geojson')
+  .then(res => res.json())
+  .then(geojson => {
+    globe.polygonsData(geojson.features);
+  });
+
+// Muat GeoJSON langsung ke peta 2D agar tajam
 fetch('geojson/mataram_kuno.geojson')
   .then(res => res.json())
   .then(data => {
